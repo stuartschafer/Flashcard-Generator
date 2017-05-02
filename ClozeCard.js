@@ -55,57 +55,56 @@ function createNewFlashcard() {
 		var checkCloze = answers.fullText.split(" ");
 		var checkAnswer = answers.clozeDeletion.split(" ");
 
-
 		// This checks to make sure the word or phrase is in the full text
 		for (var i = 0; i < checkAnswer.length; i++) {
 			if (checkCloze.indexOf(checkAnswer[i]) === -1) {
 				console.log("That isn't in your text. Please try again.");
-				whatToDo();
+				createNewFlashcard()
 			} else if (answers.fullText === "" || answers.clozeDeletion === "") {
 				console.log("Oops. Looks like you left something blank.  Please try again.");
+				createNewFlashcard();
+			} else {
+
+				console.log("This flashcard has been added.");
+
+				console.log("======================");
+				console.log("Flashcard: " + answers.fullText + "\nWord(s) omitted: " + answers.clozeDeletion);
+				console.log("======================");
+				var fc = new Flashcard (answers.fullText, answers.clozeDeletion);
+
+				// This reads the flashcards from the log.txt file. (They are in an array)
+				fs.readFile("log.txt", function (err, data) {
+				    if (err) {
+				        throw err;
+				    }
+
+				    // This makes sure there is data to parse in the log.txt file
+				    if (data.length === 0) {
+				    } else {
+					data = JSON.parse(data);
+					}
+
+					// This takes the array in the log.txt and puts it in the array with the new flashcard created
+					for (var i = 0; i < data.length; i++) {
+						var fcFile = new Flashcard (data[i].front, data[i].back);
+						flashcardArray.push(fcFile);
+					}
+
+					// This pushes the flashcard just created to the array
+					flashcardArray.push(fc);
+
+					// This writes the flashcard array to log.txt, overwriting the previous array
+					fs.writeFile("log.txt", JSON.stringify(flashcardArray), function(err) {
+			  			if (err) {
+							return console.log(err);
+						} 
+					});
+				});
+				var flashcardArray = [];
+				// Goes back to the starting menu
 				whatToDo();
 			}
 		}
-		console.log("This flashcard has been added.");
-
-		console.log("======================");
-		console.log("Flashcard: " + answers.fullText + "\nWord(s) omitted: " + answers.clozeDeletion);
-		console.log("======================");
-		var fc = new Flashcard (answers.fullText, answers.clozeDeletion);
-
-		// This reads the flashcards from the log.txt file. (They are in an array)
-		fs.readFile("log.txt", function (err, data) {
-		    if (err) {
-		        throw err;
-		    }
-
-		    // This makes sure there is data to parse in the log.txt file
-		    if (data.length === 0) {
-		    } else {
-			data = JSON.parse(data);
-			}
-
-			// This takes the array in the log.txt and puts it in the array with the new flashcard created
-			for (var i = 0; i < data.length; i++) {
-				var fcFile = new Flashcard (data[i].front, data[i].back);
-				flashcardArray.push(fcFile);
-			}
-
-			// This pushes the flashcard just created to the array
-			flashcardArray.push(fc);
-
-			// This writes the flashcard array to log.txt, overwriting the previous array
-			fs.writeFile("log.txt", JSON.stringify(flashcardArray), function(err) {
-	  			if (err) {
-					return console.log(err);
-				} 
-			});
-		});
-
-		var flashcardArray = [];
-		// Goes back to the starting menu
-		whatToDo();
-		
 	});	
 }
 
