@@ -1,1 +1,0 @@
-[{"front":"I like to eat a lot of candy","back":"like eat candy"},{"front":"Cats are awesome","back":"cats"},{"front":"we are here","back":"we"},{"front":"I like cats","back":"csadfasd"},{"front":"I like cvats","back":"fdsaf"},{"front":"i like food","back":"uewrmvufdskjhaskjfhkjfhjdsf"},{"front":"i like food","back":"food"}]

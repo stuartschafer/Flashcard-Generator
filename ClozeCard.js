@@ -72,19 +72,19 @@ function createNewFlashcard() {
 				console.log("======================");
 				var fc = new Flashcard (answers.fullText, answers.clozeDeletion);
 
-				// This reads the flashcards from the log.txt file. (They are in an array)
-				fs.readFile("log.txt", function (err, data) {
+				// This reads the flashcards from the log.json file. (They are in an array)
+				fs.readFile("log.json", "UTF-8", function (err, data) {
 				    if (err) {
 				        throw err;
 				    }
 
-				    // This makes sure there is data to parse in the log.txt file
+				    // This makes sure there is data to parse in the log.json file
 				    if (data.length === 0) {
 				    } else {
 					data = JSON.parse(data);
 					}
 
-					// This takes the array in the log.txt and puts it in the array with the new flashcard created
+					// This takes the array in the log.json and puts it in the array with the new flashcard created
 					for (var i = 0; i < data.length; i++) {
 						var fcFile = new Flashcard (data[i].front, data[i].back);
 						flashcardArray.push(fcFile);
@@ -93,8 +93,8 @@ function createNewFlashcard() {
 					// This pushes the flashcard just created to the array
 					flashcardArray.push(fc);
 
-					// This writes the flashcard array to log.txt, overwriting the previous array
-					fs.writeFile("log.txt", JSON.stringify(flashcardArray), function(err) {
+					// This writes the flashcard array to log.json, overwriting the previous array
+					fs.writeFile("log.json", JSON.stringify(flashcardArray), function(err) {
 			  			if (err) {
 							return console.log(err);
 						} 
@@ -109,11 +109,14 @@ function createNewFlashcard() {
 }
 
 function testFlashcards() {
-	fs.readFile("log.txt", function (err, data) {
+	fs.readFile("log.json", "UTF-8", function (err, data) {
 	    if (err) {
 	        throw err;
 	    }
-
+	    if (data === "") { console.log("You have no flashcards.  :( ");
+			whatToDo();
+			return;
+		} else
 	    data = JSON.parse(data);
 
 		testFlashcards2();
@@ -165,16 +168,23 @@ function testFlashcards() {
 }
 
 function allFlashcards() {
-	fs.readFile("log.txt", function (err, data) {
+
+	fs.readFile("log.json", "UTF-8", function (err, data) {
 	    if (err) {
 	        throw err;
 	    }
+
+	    if (data === "") { console.log("You have no flashcards.  :( ");
+			whatToDo();
+			return;
+		} else {
 	    data = JSON.parse(data);
 	    for (var i = 0; i < data.length; i++) {
 	    	console.log("Flashcard #" + (i + 1));
 	    	console.log("Full text: " + data[i].front + "\nWord(s) omitted: " + data[i].back);
 	    	console.log("======================");
 	    }
+	}
 	});
 
 	// console.log("Please enter the number on the flashcard you wish to delete.")
