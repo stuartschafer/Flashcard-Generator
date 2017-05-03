@@ -8,6 +8,7 @@ var lose = 0;
 var i = 0;
 var j = 0;
 var data;
+var removeFlashcard = "";
 
 function Flashcard(front, back) {
 	this.front = front;
@@ -15,31 +16,34 @@ function Flashcard(front, back) {
 }
 
 // This runs the starting menu
-whatToDo();
+startingMenu();
 
 // This is the starting menu
-function whatToDo() {
+function startingMenu() {
 
 	inquirer.prompt([
 		  	{
 				type: "list",
 		    	message: "Please choose what you want to do.",
-		    	choices: ["QUIT", "Add a Flashcard", "Test your Flashcards", "Display all Flashcards"],
+		    	choices: ["QUIT", "Create new Flashcard", "Test your Flashcards", "Display all Flashcards", "DELETE a Flashcard"],
 		    	name: "choices"
 		  	}
 		]).then(function(answers) {
-		  	if (answers.choices === "Add a Flashcard") {
+		  	if (answers.choices === "Create new Flashcard") {
 		  		createNewFlashcard();
 		  	} else if (answers.choices === "Test your Flashcards") {
 		  		j = 0;
 		  		testFlashcards();
 		  	} else if (answers.choices === "Display all Flashcards") {
 		  		allFlashcards();
+		  	} else if (answers.choices === "DELETE a Flashcard") {
+		  		removeFlashcard = "yes";
+		  		allFlashcards();
 		  	} else { return; }
 		});
 }
 
-// This happens when the user selects tyo create a new flashcard
+// This happens when the user selects "Create new Flashcard" from the starting menu
 function createNewFlashcard() {
 	
 	inquirer.prompt([
@@ -51,9 +55,8 @@ function createNewFlashcard() {
 	  		message: "Please enter what you want to remove from the text."
 	  	}
 	]).then(function(answers) {
-		answers.clozeDeletion = answers.clozeDeletion.toLowerCase();
-		var checkCloze = answers.fullText.split(" ");
-		var checkAnswer = answers.clozeDeletion.split(" ");
+		var checkCloze = answers.fullText.toLowerCase().split(" ");
+		var checkAnswer = answers.clozeDeletion.toLowerCase().split(" ");
 
 		// This checks to make sure the word or phrase is in the full text
 		for (var i = 0; i < checkAnswer.length; i++) {
@@ -104,7 +107,7 @@ function createNewFlashcard() {
 		// This empties the array
 		var flashcardArray = [];
 		// Goes back to the starting menu
-		whatToDo();
+		startingMenu();
 			
 	});	
 }
@@ -115,7 +118,7 @@ function testFlashcards() {
 	        throw err;
 	    }
 	    if (data === "") { console.log("You have no flashcards.  :( ");
-			whatToDo();
+			startingMenu();
 			return;
 		} else
 	    data = JSON.parse(data);
@@ -124,27 +127,23 @@ function testFlashcards() {
 
 		function testFlashcards2() {
 			if (data.length === 0) { console.log("You don't have any flashcards to test yet");
-					whatToDo();
+					startingMenu();
 			} else { 
 				if (j < data.length) {
 
 					data[j].back = data[j].back.toLowerCase();
 					var clozeStuff = data[j].back.split(" ");
+					
+					// This removes part of the full text with ___
+					for (var c = 0; c < clozeStuff.length; c++) {
+						data[j].front = data[j].front.replace(clozeStuff[c], "_____");
+					}
 
 					inquirer.prompt([
 					  	{
 					    	name: "frontOfCard",
-					    	message: "Flashcard #" + (j + 1) + " " + (data[j].front).
-						    	replace(clozeStuff[0], "_____").
-						    	replace(clozeStuff[1], "_____").
-						    	replace(clozeStuff[2], "_____").
-						    	replace(clozeStuff[3], "_____").
-						    	replace(clozeStuff[4], "_____").
-						    	replace(clozeStuff[5], "_____").
-						    	replace(clozeStuff[6], "_____").
-						    	replace(clozeStuff[7], "_____").
-						    	replace(clozeStuff[8], "_____").
-						    	replace(clozeStuff[9], "_____")
+					    	message: "Flashcard #" + (j + 1) + " " + data[j].front
+
 					  	}
 					]).then(function(answers) {
 					  	if ((answers.frontOfCard).toLowerCase() === (data[j].back).toLowerCase()) {
@@ -161,7 +160,7 @@ function testFlashcards() {
 					
 				} else { console.log("The flashcards are over.\nYou got " + win + " correct and " + lose + " wrong.");
 					j = 0;
-					whatToDo();
+					startingMenu();
 				}
 			}
 		}
@@ -175,18 +174,59 @@ function allFlashcards() {
 	        throw err;
 	    }
 
-	    if (data === "") { console.log("You have no flashcards.  :( ");
-			whatToDo();
+	    if (data === "" || data === "[]") { console.log("You have no flashcards.  :( ");
+			startingMenu();
 			return;
 		} else {
-	    data = JSON.parse(data);
-	    for (var i = 0; i < data.length; i++) {
-	    	console.log("Flashcard #" + (i + 1));
-	    	console.log("Full text: " + data[i].front + "\nWord(s) omitted: " + data[i].back);
-	    	console.log("======================");
-	    }
-	}
-	});
+		    data = JSON.parse(data);
+		    for (var i = 0; i < data.length; i++) {
+		    	console.log("Flashcard #" + (i + 1));
+		    	console.log("Full text: " + data[i].front + "\nWord(s) omitted: " + data[i].back);
+		    	console.log("======================");
+		    }
+		    	
+		    if (removeFlashcard === "yes") { removeFlashcard = "no";
+	    		deleteAFlashcard();
+	    		return;
+		    }
+		    	startingMenu();
+		    	return;  
+		}
+		
+		function deleteAFlashcard() {
 
-	// console.log("Please enter the number on the flashcard you wish to delete.")
+			inquirer.prompt([
+		  	{
+		  		name: "deleteCard",
+		  		message: "Please enter the number on the flashcard you wish to delete."
+		  	}
+			]).then(function(answers) {
+				if (answers.deleteCard === "") { console.log("You didn't select a number.");
+				deleteAFlashcard();
+				return;
+			} else if (answers.deleteCard > data.length || answers.deleteCard < 0 || isNaN(answers.deleteCard) === true) { console.log("That's not a valid selection.");
+				deleteAFlashcard();
+				return;
+			}
+
+			answers.deleteCard -= 1;
+
+			data.splice(answers.deleteCard, 1);
+			console.log("It has been deleted.");
+
+				// This takes the array in the log.json and puts it in the array with the new flashcard created
+				for (var i = 0; i < data.length; i++) {
+					var fcFile = new Flashcard (data[i].front, data[i].back);
+					flashcardArray.push(fcFile);
+				}
+				
+				fs.writeFile("log.json", JSON.stringify(data), function(err) {
+	  				if (err) {
+					return console.log(err);
+					} 
+				});
+				startingMenu();
+			});
+		}
+	});	
 }
