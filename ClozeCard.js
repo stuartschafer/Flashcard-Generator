@@ -1,5 +1,6 @@
 var inquirer = require("inquirer");
 var fs = require("fs");
+var Flashcard = require("./constructor.js");
 var flashcardArray = [];
 var fullTextArray = [];
 var clozeArray = [];
@@ -10,17 +11,12 @@ var j = 0;
 var data;
 var removeFlashcard = "";
 
-function Flashcard(front, back) {
-	this.front = front;
-	this.back = back;
-}
-
 // This runs the starting menu
 startingMenu();
 
 // This is the starting menu
 function startingMenu() {
-
+	// This asks the user what they want to do
 	inquirer.prompt([
 		  	{
 				type: "list",
@@ -55,12 +51,17 @@ function createNewFlashcard() {
 	  		message: "Please enter what you want to remove from the text."
 	  	}
 	]).then(function(answers) {
-		var checkCloze = answers.fullText.toLowerCase().split(" ");
-		var checkAnswer = answers.clozeDeletion.toLowerCase().split(" ");
+		var checkCloze = answers.fullText.split(" ");
+		var checkAnswer = answers.clozeDeletion.split(" ");
+
+		// Created a new variable to covert everything to lowercase
+		// Don't want to add these lower case answers to the flashcard array
+		var lowerCheckCloze = answers.fullText.toLowerCase().split(" ");
+		var lowerCheckAnswer = answers.clozeDeletion.toLowerCase().split(" ");
 
 		// This checks to make sure the word or phrase is in the full text
 		for (var i = 0; i < checkAnswer.length; i++) {
-			if (checkCloze.indexOf(checkAnswer[i]) === -1) {
+			if (lowerCheckCloze.indexOf(lowerCheckAnswer[i]) === -1) {
 				console.log("That isn't in your text. Please try again.");
 				createNewFlashcard();
 				return;
@@ -113,6 +114,7 @@ function createNewFlashcard() {
 }
 
 function testFlashcards() {
+	// This reads the content of the log.json file
 	fs.readFile("log.json", "UTF-8", function (err, data) {
 	    if (err) {
 	        throw err;
@@ -131,18 +133,18 @@ function testFlashcards() {
 			} else { 
 				if (j < data.length) {
 
-					data[j].back = data[j].back.toLowerCase();
+					data[j].back = data[j].back;
 					var clozeStuff = data[j].back.split(" ");
 					
 					// This removes part of the full text with ___
 					for (var c = 0; c < clozeStuff.length; c++) {
-						data[j].front = data[j].front.replace(clozeStuff[c], "_____");
+						var clozeText = data[j].front.toLowerCase().replace(clozeStuff[c], "_____");
 					}
 
 					inquirer.prompt([
 					  	{
 					    	name: "frontOfCard",
-					    	message: "Flashcard #" + (j + 1) + " " + data[j].front
+					    	message: "Flashcard #" + (j + 1) + " " + clozeText
 
 					  	}
 					]).then(function(answers) {
@@ -155,6 +157,7 @@ function testFlashcards() {
 							lose++;
 						}
 						j++;
+						// This is the recursion to cycle through the flashcards
 						testFlashcards();
 					});
 					
@@ -198,19 +201,25 @@ function allFlashcards() {
 			inquirer.prompt([
 		  	{
 		  		name: "deleteCard",
-		  		message: "Please enter the number on the flashcard you wish to delete."
+		  		message: "Please enter the number on the flashcard you wish to delete. Type q to exit."
 		  	}
 			]).then(function(answers) {
-				if (answers.deleteCard === "") { console.log("You didn't select a number.");
+				
+				if (answers.deleteCard.toLowerCase() === "q") {
+					startingMenu();
+		    		return; 
+				} else if (answers.deleteCard === "") { console.log("You didn't select a number.");
 				deleteAFlashcard();
 				return;
-			} else if (answers.deleteCard > data.length || answers.deleteCard < 0 || isNaN(answers.deleteCard) === true) { console.log("That's not a valid selection.");
-				deleteAFlashcard();
-				return;
-			}
+				} else if (answers.deleteCard > data.length || answers.deleteCard < 0 || isNaN(answers.deleteCard) === true) { console.log("That's not a valid selection.");
+					deleteAFlashcard();
+					return;
+				}
 
+			// This subtracts 1 from the answer b/c indexes start at 0.
 			answers.deleteCard -= 1;
 
+			// This deletes the flashcard from the array
 			data.splice(answers.deleteCard, 1);
 			console.log("It has been deleted.");
 
