@@ -51,17 +51,12 @@ function createNewFlashcard() {
 	  		message: "Please enter what you want to remove from the text."
 	  	}
 	]).then(function(answers) {
-		var checkCloze = answers.fullText.split(" ");
-		var checkAnswer = answers.clozeDeletion.split(" ");
-
-		// Created a new variable to covert everything to lowercase
-		// Don't want to add these lower case answers to the flashcard array
-		var lowerCheckCloze = answers.fullText.toLowerCase().split(" ");
-		var lowerCheckAnswer = answers.clozeDeletion.toLowerCase().split(" ");
-
+		var checkCloze = answers.fullText.toLowerCase().split(/\W+/);
+		var checkAnswer = answers.clozeDeletion.toLowerCase().split(" ");
+		
 		// This checks to make sure the word or phrase is in the full text
 		for (var i = 0; i < checkAnswer.length; i++) {
-			if (lowerCheckCloze.indexOf(lowerCheckAnswer[i]) === -1) {
+			if (checkCloze.indexOf(checkAnswer[i]) === -1) {
 				console.log("That isn't in your text. Please try again.");
 				createNewFlashcard();
 				return;
