@@ -163,6 +163,8 @@ function testFlashcards() {
 					
 				} else { console.log("The flashcards are over.\nYou got " + win + " correct and " + lose + " wrong.");
 					j = 0;
+					win = 0;
+					lose = 0;
 					startingMenu();
 				}
 			}
