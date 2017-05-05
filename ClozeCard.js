@@ -114,7 +114,7 @@ function createNewFlashcard() {
 }
 
 function testFlashcards() {
-	// This reads the content of the log.json file
+	// This reads the content of the log.json
 	fs.readFile("log.json", "UTF-8", function (err, data) {
 	    if (err) {
 	        throw err;
@@ -133,12 +133,12 @@ function testFlashcards() {
 			} else { 
 				if (j < data.length) {
 
-					data[j].back = data[j].back;
+					var clozeText = data[j].front;
 					var clozeStuff = data[j].back.split(" ");
 					
 					// This removes part of the full text with ___
 					for (var c = 0; c < clozeStuff.length; c++) {
-						var clozeText = data[j].front.toLowerCase().replace(clozeStuff[c], "_____");
+						clozeText = clozeText.toLowerCase().replace(clozeStuff[c], "_____");
 					}
 
 					inquirer.prompt([
