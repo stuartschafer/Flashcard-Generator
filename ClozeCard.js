@@ -51,6 +51,7 @@ function createNewFlashcard() {
 	  		message: "Please enter what you want to remove from the text."
 	  	}
 	]).then(function(answers) {
+		// /\W+/ removes all non-english text such as , . ? and ! that a user may enter in the full text
 		var checkCloze = answers.fullText.toLowerCase().split(/\W+/);
 		var checkAnswer = answers.clozeDeletion.toLowerCase().split(" ");
 		
