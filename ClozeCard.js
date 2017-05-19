@@ -74,6 +74,8 @@ function createNewFlashcard() {
 		console.log("======================");
 		var fc = new Flashcard (answers.fullText, answers.clozeDeletion);
 
+
+
 		// This reads the flashcards from the log.json file. (They are in an array)
 		fs.readFile("log.json", "UTF-8", function (err, data) {
 		    if (err) {
