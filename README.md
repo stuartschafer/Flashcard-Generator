@@ -7,5 +7,7 @@ All information is stored in a .json file so flashcards can be recalled after cl
 
 It is run by typing 'node ClozeCard.js' in terminal/bash.
 
+![](demo.gif)
+
 Video demo:
 https://drive.google.com/open?id=0B99Fu0owdBT7dVRGV2FCMFZPTzg
